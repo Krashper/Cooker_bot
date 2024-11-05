@@ -6,36 +6,7 @@ import nltk
 from base_function import BaseFunction
 from functions_info import FunctionsInfo
 from config_data.config import Config
-
-
-class Ingredient:
-    def __init__(self, value: None | str = None):
-        self.value = value
-
-    def __get__(self, instance, owner):
-        return self.value
-
-    def __set__(self, instance, value):
-        if isinstance(value, str) and value.isalpha():
-            self.value = value.lower()
-        else:
-            raise Exception("Ошибка при задании ингредиента: Значение должно быть строчным и содержать только буквы английского алфавита")
-
-
-class RecipesNumber:
-    def __init__(self, value: None | int = None):
-        self.value = value
-
-    def __get__(self, instance, owner):
-        return self.value
-
-    def __set__(self, instance, value):
-        if isinstance(value, int) and value <= 10 and value > 0:
-            self.value = value
-        else:
-            raise Exception(
-                "Ошибка при задании количества рецептов: Значение должно быть числовым в диапозоне 1-10")
-
+from data_classes import Ingredient, RecipesNumber
 
 
 class SearchByIngredients(BaseFunction):
@@ -77,10 +48,10 @@ class SearchByIngredients(BaseFunction):
             flag = True
 
             while flag:
-                recipes_number: int = input("Введите кол-во рецептов: ")
+                recipes_number: int = int(input("Введите кол-во рецептов: "))
                 self.recipes_number = recipes_number
 
-                pressed_key = input("Q - выйти, другие клавиши - продолжить: ").lower()
+                pressed_key = input("Q - выйти, другие клавиши - ввести значение заново: ").lower()
                 flag = False if pressed_key == "q" else True
         except Exception as e:
             raise Exception("Ошибка при задании кол-ва рецептов: ", e)
@@ -97,7 +68,7 @@ class SearchByIngredients(BaseFunction):
 
     def __get_dish_ids(self):
         try:
-            if self.__api_key == None:
+            if self.__api_key is None:
                 self.__api_key = self.__get_api_key()
 
             url = "https://api.spoonacular.com/recipes/findByIngredients"
@@ -177,7 +148,6 @@ class SearchByIngredients(BaseFunction):
                 print("-" * 20)
         except Exception as e:
             raise Exception("Ошибка при отображении полученных рецептов через API: ", e)
-
 
     def execute_function(self):
         self.__set_ingredients()
